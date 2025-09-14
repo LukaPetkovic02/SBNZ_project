@@ -3,7 +3,9 @@ package com.ftn.sbnz.backward.model.models;
 
 import com.ftn.sbnz.backward.model.enums.Suit;
 
-public class Card {
+import java.util.Objects;
+
+public class Card implements Comparable<Card>{
     private String rank;
     private Suit suit;
     public Card(){}
@@ -46,6 +48,24 @@ public class Card {
             case "A": return 14;
             default: return 0;
         }
+    }
+
+    @Override
+    public int compareTo(Card other){
+        return Integer.compare(this.getRankValue(), other.getRankValue());
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) return true;
+        if(obj == null || getClass() != obj.getClass()) return false;
+        Card card = (Card) obj;
+        return Objects.equals(rank, card.rank) && suit == card.suit;
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(rank, suit);
     }
 
     @Override
