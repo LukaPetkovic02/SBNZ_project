@@ -7,7 +7,7 @@ public class Board {
     private List<Player> players;
     private int SBPosition; // small blind
     private int BBPosition; // big blind
-    private List<Card> cards;
+    private List<Card> cards; // karte na stolu
     private int potSize;
 
     public Board() {}
