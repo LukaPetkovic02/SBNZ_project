@@ -28,12 +28,14 @@ public class ActivateTemplateRulesService {
       System.out.println("=== HAND STRENGTH RESULTS ===");
       for (Player player : game.getPlayers()) {
         Hand hand = player.getHand();
-        System.out.printf("Player: %s | Cards: %s | Strength: %.2f | Category: %s%n",
-                player.getName(),
-                formatCards(hand.getHoleCards()),
-                hand.getHandStrength(),
-                hand.getHandCategory()
-        );
+        if(player.getName().equals("Drools1")){ // ispisi samo za glavnog igraca
+          System.out.printf("Player: %s | Cards: %s | Strength: %.2f | Category: %s%n",
+                  player.getName(),
+                  formatCards(hand.getHoleCards()),
+                  hand.getHandStrength(),
+                  hand.getHandCategory()
+          );
+        }
       }
       System.out.println("================================");
 
@@ -86,9 +88,10 @@ public class ActivateTemplateRulesService {
 
       Hand hand = new Hand(cards.get(0), cards.get(1));
       player.setHand(hand);
+      if(player.getName().equals("Drools1")){
+        System.out.println("Dealt to " + player.getName() + ": " + cards.get(0) + ", " + cards.get(1));
+      }
 
-      System.out.println("Dealt to " + player.getName() + ": " +
-              cards.get(0) + ", " + cards.get(1));
     }
   }
 

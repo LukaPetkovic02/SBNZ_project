@@ -25,6 +25,7 @@ when
          $hand.getHoleCards().get(1).getRank().equals("@{card1}"))
     )
     eval($hand.isSuited() == false)
+    eval($player.getName().equals("Drools1"))
 then
     $hand.setHandStrength(@{handStrength});
     $hand.setHandCategory("@{handType}");
