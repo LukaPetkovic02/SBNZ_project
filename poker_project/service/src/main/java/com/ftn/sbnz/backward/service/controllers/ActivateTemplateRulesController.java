@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ftn.sbnz.backward.service.services.ActivateBackwardRulesService;
+import com.ftn.sbnz.backward.service.services.ActivateTemplateRulesService;
 
 @RestController
-@RequestMapping("/backward-example")
-public class ActivateBackwardRulesController {
-  private ActivateBackwardRulesService backService;
+@RequestMapping("/template-example")
+public class ActivateTemplateRulesController {
+  private ActivateTemplateRulesService backService;
 
   @Autowired
-  public ActivateBackwardRulesController(ActivateBackwardRulesService backService) {
+  public ActivateTemplateRulesController(ActivateTemplateRulesService backService) {
     this.backService = backService;
   }
 

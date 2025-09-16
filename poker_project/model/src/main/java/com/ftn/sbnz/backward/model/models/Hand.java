@@ -5,7 +5,7 @@ import com.ftn.sbnz.backward.model.enums.HandType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Hand { // ruka glavnog igraca - za kog predlazemo akcije
+public class Hand {
     private List<Card> holeCards; // 2 karte igraca
     private List<Card> allCards; // sve karte (hole + community)
     private HandType handType;

@@ -70,6 +70,14 @@ public class Card implements Comparable<Card>{
 
     @Override
     public String toString() {
-        return rank + suit;
+        String suitSymbol;
+        switch (suit) {
+            case SPADE:   suitSymbol = "♠"; break;
+            case HEART:   suitSymbol = "♥"; break;
+            case DIAMOND: suitSymbol = "♦"; break;
+            case CLUB:    suitSymbol = "♣"; break;
+            default:      suitSymbol = "?"; break;
+        }
+        return rank + suitSymbol;
     }
 }

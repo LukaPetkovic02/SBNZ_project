@@ -1,0 +1,35 @@
+template header
+card1
+card2
+handType
+handStrength
+position
+
+package rules.templates;
+
+import com.ftn.sbnz.backward.model.models.Hand;
+import com.ftn.sbnz.backward.model.models.Player;
+import com.ftn.sbnz.backward.model.models.Card;
+
+template "hand-strength-offsuit-rules"
+
+rule "Hand Strength @{card1}@{card2} offsuit_@{row.rowNumber}"
+salience 50
+when
+    $player : Player()
+    $hand : Hand() from $player.hand
+    eval(
+        ($hand.getHoleCards().get(0).getRank().equals("@{card1}") &&
+         $hand.getHoleCards().get(1).getRank().equals("@{card2}")) ||
+        ($hand.getHoleCards().get(0).getRank().equals("@{card2}") &&
+         $hand.getHoleCards().get(1).getRank().equals("@{card1}"))
+    )
+    eval($hand.isSuited() == false)
+then
+    $hand.setHandStrength(@{handStrength});
+    $hand.setHandCategory("@{handType}");
+    System.out.println("RULE FIRED: " + $player.getName() + " - @{card1}@{card2} offsuit" +
+                      " - Strength: @{handStrength} - Category: @{handType}");
+end
+
+end template

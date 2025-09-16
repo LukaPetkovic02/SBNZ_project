@@ -134,8 +134,15 @@ public class Player {
         return status == PlayerStatus.ACTIVE && !allIn;
     }
 
-    public boolean isInPosition(){
-        // implementirati logiku za poziciju
-        return position >= 6;
+    public String getPositionString() {
+        if (position >= 0 && position <= 1) {
+            return "EARLY";
+        } else if (position >= 2 && position <= 3) {
+            return "MIDDLE";
+        } else if (position >= 4 && position <= 5) {
+            return "LATE";
+        } else {
+            return "UNKNOWN";
+        }
     }
 }
