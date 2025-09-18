@@ -21,13 +21,27 @@ public class BluffCepService {
         Player player = new Player("1","Drools1",1000,1);
         kieSession.insert(player);
 
-        entryPoint.insert(new BluffEvent(player.getId(), System.currentTimeMillis()));
-        entryPoint.insert(new BluffEvent(player.getId(), System.currentTimeMillis()+1000));
-        entryPoint.insert(new BluffEvent(player.getId(), System.currentTimeMillis()+2000));
+        new Thread(() -> {
+            kieSession.fireUntilHalt();
+        }).start();
+        
+        new Thread(() -> {
+            try {
+                entryPoint.insert(new BluffEvent(player.getId()));
+                Thread.sleep(1000);
 
-        int fired = kieSession.fireAllRules();
-        System.out.println("CEP rules fired: " + fired);
+                entryPoint.insert(new BluffEvent(player.getId()));
+                Thread.sleep(1000);
 
-        kieSession.dispose();
+                entryPoint.insert(new BluffEvent(player.getId()));
+                Thread.sleep(1000);
+
+                kieSession.halt();
+                kieSession.dispose();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

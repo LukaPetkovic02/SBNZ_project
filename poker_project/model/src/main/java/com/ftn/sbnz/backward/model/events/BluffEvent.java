@@ -13,6 +13,10 @@ public class BluffEvent {
         this.playerId = playerId;
         this.timestamp = timestamp;
     }
+    public BluffEvent(String playerId){
+        this.playerId = playerId;
+        this.timestamp = System.currentTimeMillis();
+    }
     public String getPlayerId(){
         return playerId;
     }
