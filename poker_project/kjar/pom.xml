@@ -45,7 +45,7 @@
 
 		<dependency>
 			<groupId>com.ftn.sbnz</groupId>
-			<artifactId>backward-model</artifactId>
+			<artifactId>model</artifactId>
 			<version>${backward.version}</version>
 		</dependency>
 	</dependencies>
