@@ -33,15 +33,17 @@
 
 		<dependency>
 			<groupId>com.ftn.sbnz</groupId>
-			<artifactId>model</artifactId>
+			<artifactId>kjar</artifactId>
 			<version>${backward.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.ftn.sbnz</groupId>
-			<artifactId>kjar</artifactId>
+			<artifactId>model</artifactId>
 			<version>${backward.version}</version>
 		</dependency>
+
+
 
 		<dependency>
 			<groupId>org.kie</groupId>
