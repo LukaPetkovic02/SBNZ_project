@@ -13,6 +13,8 @@ when
         count()
     )
 then
-    insert(new PlayerProfile("FREQUENT_BLUFFER", 0.7));
+    PlayerProfile profile = new PlayerProfile("FREQUENT_BLUFFER", 0.7);
+    $player.setProfile(profile);
+    insert(profile);
     System.out.println("Player " + $id + " classified as frequent bluffer");
 end

@@ -18,6 +18,11 @@ public class CepController {
 
     @GetMapping("/bluff-detect")
     public void detectBluffs(){
-        bluffCepService.detectBluffs();
+        try{
+            bluffCepService.detectBluffs();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
     }
 }
