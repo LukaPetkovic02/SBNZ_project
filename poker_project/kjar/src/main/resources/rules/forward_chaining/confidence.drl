@@ -1,0 +1,35 @@
+package rules.forward_chaining;
+//dialect  "mvel"
+
+import com.ftn.sbnz.backward.model.events.BluffEvent;
+import com.ftn.sbnz.backward.model.events.FoldEvent;
+import com.ftn.sbnz.backward.model.models.Player
+import com.ftn.sbnz.backward.model.models.PlayerProfile;
+
+rule "Increase Confidence on Bluff"
+when
+    $bluff: BluffEvent($id : playerId)
+    $player: Player(id == $id, profile.profileType == "FREQUENT_BLUFFER")
+then
+    PlayerProfile newProfile = $player.getProfile();
+    newProfile.setConfidence(newProfile.getConfidence() + 0.1);
+    modify($player) {
+        setProfile(newProfile)
+    }
+    retract($bluff)
+    System.out.println("Player " + $id + " confidence increased to " + String.format("%.2f", newProfile.getConfidence()));
+end
+
+rule "Decrease Confidence on Fold"
+when
+    $fold : FoldEvent($id : playerId)
+    $player : Player(id == $id, $profile : profile, profile.profileType == "FREQUENT_BLUFFER")
+then
+    PlayerProfile newProfile = $player.getProfile();
+    newProfile.setConfidence(newProfile.getConfidence() - 0.1);
+    modify($player) {
+        setProfile(newProfile)
+    }
+    retract($fold)
+    System.out.println("Player " + $id + " confidence decreased to " + String.format("%.2f", newProfile.getConfidence()));
+end

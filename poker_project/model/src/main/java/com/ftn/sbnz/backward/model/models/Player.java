@@ -22,6 +22,8 @@ public class Player {
     private int actionCount;
     private boolean hasActed;
 
+    private int lossCount; // non-fold losses
+
     public Player() {
         this.status = PlayerStatus.ACTIVE;
         this.blindType = BlindType.NONE;
@@ -31,6 +33,7 @@ public class Player {
         this.totalBetThisHand = 0;
         this.actionCount = 0;
         this.hasActed = false;
+        this.lossCount = 0;
     }
 
     public Player(String id, String name, int initialChips, int position) {
@@ -40,6 +43,7 @@ public class Player {
         this.chips = initialChips;
         this.position = position;
         this.hand = new Hand();
+        this.lossCount = 0;
     }
 
     public void addChips(int amount) {
@@ -79,6 +83,16 @@ public class Player {
         this.status = PlayerStatus.FOLDED;
         this.hasActed = true;
         this.lastAction = "FOLD";
+    }
+
+    public int getLossCount(){
+        return this.lossCount;
+    }
+    public void setLossCount(int lossCount){
+        this.lossCount = lossCount;
+    }
+    public void incrementLossCount(){
+        this.lossCount++;
     }
 
     public String getId() { return id; }

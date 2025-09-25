@@ -7,14 +7,15 @@ import com.ftn.sbnz.backward.model.models.PlayerProfile;
 
 rule "Detect Frequent Bluffer"
 when
-    $player : Player($id : id)
+    $player : Player($id : id, profile.profileType == "UNKNOWN")
     Number(intValue >= 3) from accumulate(
         BluffEvent(playerId == $id) over window:time(5m) from entry-point "player-actions",
         count()
     )
 then
-    PlayerProfile profile = new PlayerProfile("FREQUENT_BLUFFER", 0.7);
+    PlayerProfile profile = new PlayerProfile("FREQUENT_BLUFFER", 0.5);
     $player.setProfile(profile);
     insert(profile);
+    update($player)
     System.out.println("Player " + $id + " classified as frequent bluffer");
 end

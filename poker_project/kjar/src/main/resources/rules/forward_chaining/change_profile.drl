@@ -1,0 +1,45 @@
+package rules.forward_chaining;
+//dialect  "mvel"
+
+import com.ftn.sbnz.backward.model.events.BluffEvent;
+import com.ftn.sbnz.backward.model.events.FoldEvent;
+import com.ftn.sbnz.backward.model.events.LossEvent;
+import com.ftn.sbnz.backward.model.models.Player
+import com.ftn.sbnz.backward.model.models.PlayerProfile;
+
+rule "Increment Loss Count"
+when
+    $loss : LossEvent($id : playerId)
+    $player : Player(id == $id)
+then
+    $player.incrementLossCount();
+    update($player);
+    retract($loss);
+end
+
+rule "Frequent Bluffer becomes Tilted"
+when
+    $player : Player(
+        lossCount >= 5,
+        profile.profileType == "FREQUENT_BLUFFER",
+        profile.confidence > 0.85
+    )
+then
+    modify($player){
+        setProfile(new PlayerProfile("TILTED", 0.9))
+    }
+    System.out.println("Player " + $player.getId() + " is now TILTED");
+end
+
+rule "Frequent Bluffer goes to STABLE"
+when
+    $player : Player(
+        profile.profileType == "FREQUENT_BLUFFER",
+        profile.confidence < 0.3
+    )
+then
+    modify($player) {
+        setProfile(new PlayerProfile("STABLE", 0.5))
+    }
+    System.out.println("Player " + $player.getId() + " profile is STABLE");
+end
