@@ -1,0 +1,19 @@
+package rules.forward_chaining;
+dialect  "mvel"
+
+import com.ftn.sbnz.backward.model.events.RaiseEvent;
+import com.ftn.sbnz.backward.model.events.BluffEvent;
+import com.ftn.sbnz.backward.model.models.Player;
+
+rule "Raise with weak hand → potential bluff"
+when
+    $raise : RaiseEvent($id : playerId, $amount : amount) from entry-point "player-actions"
+    $player : Player(id == $id, $hand : hand)
+    eval($hand.getHandStrength() < 0.4)
+then
+    BluffEvent bluff = new BluffEvent($id);
+    drools.getEntryPoint("player-actions").insert(bluff);
+    delete($raise);
+    System.out.println("Player " + $id + " raised " + $amount + " with weak hand (strength="
+                        + $hand.getHandStrength() + ") → BluffEvent created");
+end

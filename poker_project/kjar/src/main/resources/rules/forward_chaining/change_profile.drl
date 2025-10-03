@@ -9,7 +9,7 @@ import com.ftn.sbnz.backward.model.models.PlayerProfile;
 
 rule "Increment Loss Count"
 when
-    $loss : LossEvent($id : playerId)
+    $loss : LossEvent($id : playerId) from entry-point "player-actions"
     $player : Player(id == $id)
 then
     $player.incrementLossCount();

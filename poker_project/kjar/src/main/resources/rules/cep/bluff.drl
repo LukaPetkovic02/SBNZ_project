@@ -3,7 +3,9 @@ package rules.cep;
 
 import com.ftn.sbnz.backward.model.events.BluffEvent;
 import com.ftn.sbnz.backward.model.models.Player;
-import com.ftn.sbnz.backward.model.models.PlayerProfile;
+import com.ftn.sbnz.backward.model.models.PlayerProfile
+import org.kie.api.runtime.rule.EntryPoint
+import org.kie.api.runtime.rule.FactHandle;
 
 rule "Detect Frequent Bluffer"
 when
@@ -13,9 +15,21 @@ when
         count()
     )
 then
+    // retract BluffEventova kako ne bi dodatno trigerovali povecanje confidence u drugom pravilu
+    EntryPoint ep = drools.getEntryPoint("player-actions");
+        for (FactHandle handle : ep.getFactHandles()) {
+            Object obj = ep.getObject(handle);
+            if (obj instanceof BluffEvent) {
+                BluffEvent bluff = (BluffEvent) obj;
+                if (bluff.getPlayerId().equals($id)) {
+                    ep.retract(handle);
+                }
+            }
+        }
+
     PlayerProfile profile = new PlayerProfile("FREQUENT_BLUFFER", 0.5);
     $player.setProfile(profile);
     insert(profile);
-    update($player)
+    update($player);
     System.out.println("Player " + $id + " classified as frequent bluffer");
 end

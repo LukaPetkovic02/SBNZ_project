@@ -3,6 +3,8 @@ package com.ftn.sbnz.backward.service.services;
 import com.ftn.sbnz.backward.model.events.BluffEvent;
 import com.ftn.sbnz.backward.model.events.FoldEvent;
 import com.ftn.sbnz.backward.model.events.LossEvent;
+import com.ftn.sbnz.backward.model.events.RaiseEvent;
+import com.ftn.sbnz.backward.model.models.Hand;
 import com.ftn.sbnz.backward.model.models.Player;
 import com.ftn.sbnz.backward.model.models.PlayerProfile;
 import org.kie.api.KieServices;
@@ -27,6 +29,15 @@ public class BluffCepService {
         Player player2 = new Player("2", "Drools2", 1000, 2);
         player2.setProfile(new PlayerProfile("UNKNOWN", 0.0));
 
+        // Ruke za test – obe su "slabe" da se trigguje BluffEvent
+        Hand weakHand1 = new Hand();
+        weakHand1.setHandStrength(0.2);
+        player1.setHand(weakHand1);
+
+        Hand weakHand2 = new Hand();
+        weakHand2.setHandStrength(0.25);
+        player2.setHand(weakHand2);
+
         kieSession.insert(player1);
         kieSession.insert(player2);
 
@@ -40,26 +51,26 @@ public class BluffCepService {
             try {
                 // CEP događaji za oba igrača → oba postaju FREQUENT_BLUFFER
                 for (int i = 0; i < 3; i++) {
-                    entryPoint.insert(new BluffEvent(player1.getId()));
-                    entryPoint.insert(new BluffEvent(player2.getId()));
+                    entryPoint.insert(new RaiseEvent(player1.getId(), 200));
+                    entryPoint.insert(new RaiseEvent(player2.getId(), 200));
                     Thread.sleep(500);
                 }
 
                 // Dodajemo i LossEvent-ove da pokrenu Tilt logiku
                 for (int i = 0; i < 6; i++) {
-                    kieSession.insert(new LossEvent(player1.getId()));
+                    entryPoint.insert(new LossEvent(player1.getId()));
                     Thread.sleep(300);
                 }
 
                 // Player 1 nastavlja da blefira → confidence raste → ide u TILT
                 for (int i = 0; i < 5; i++) {
-                    kieSession.insert(new BluffEvent(player1.getId()));
+                    entryPoint.insert(new RaiseEvent(player1.getId(), 100));
                     Thread.sleep(500);
                 }
 
                 // Player 2 folduje → confidence opada → vraća se u STABLE
                 for (int i = 0; i < 5; i++) {
-                    kieSession.insert(new FoldEvent(player2.getId()));
+                    entryPoint.insert(new FoldEvent(player2.getId()));
                     Thread.sleep(500);
                 }
             } catch (InterruptedException e) {
