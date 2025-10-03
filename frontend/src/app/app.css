@@ -1,0 +1,201 @@
+:root{
+	--felt-green: #0b6b2f;
+	--felt-dark: #064923;
+	--table-brown: #3a2a20;
+	--card-white: #fff;
+	--chip-color: #f1c40f;
+}
+
+/* full-screen poker background */
+html,body, :root, :host {
+	height: 100%;
+}
+
+.poker-main{
+	min-height: 100vh;
+	background: radial-gradient(circle at 30% 10%, rgba(255,255,255,0.03), transparent 10%),
+							linear-gradient(180deg, #0a6b2f 0%, #064923 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.poker-header{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 72px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.06));
+	backdrop-filter: blur(4px);
+	z-index: 60;
+	border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.poker-header .header-inner h1{
+	color: #fff;
+	font-size: 20px;
+	letter-spacing: 1px;
+	margin: 0;
+	text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* push main content down so header doesn't overlap */
+.poker-main{ padding-top: 96px }
+
+.poker-wrapper{
+	width: 100%;
+	max-width: 1100px;
+	position: relative;
+}
+
+.table{
+	width: 100%;
+	aspect-ratio: 16/9;
+	max-height: 700px;
+	background: radial-gradient(ellipse at center, rgba(255,255,255,0.02), transparent 20%),
+							linear-gradient(180deg, rgba(58,42,32,0.9), rgba(58,42,32,0.85));
+	border-radius: 50% / 40%;
+	box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 6px 20px rgba(0,0,0,0.5);
+	position: relative;
+	overflow: visible;
+	margin: 0 auto;
+}
+
+.community-cards{
+	position: absolute;
+	left: 50%;
+	top: 45%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	gap: 10px;
+}
+
+.card{
+	width: 64px;
+	height: 92px;
+	border-radius: 6px;
+	box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:700;
+}
+
+.card.back{
+	background: linear-gradient(180deg,#ffffff 0%, #e6e6e6 100%);
+	background-size: cover;
+	transform: rotate(-6deg);
+	border: 2px solid #d8d8d8;
+	overflow: hidden;
+}
+
+.card.face{
+	background: var(--card-white);
+	color: #111;
+	font-size: 18px;
+}
+
+.card img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	border-radius: 6px;
+}
+
+.player{
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	color: #fff;
+	text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+.avatar{
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.12);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:700;
+	color: #fff;
+	border: 2px solid rgba(255,255,255,0.08);
+}
+
+.avatar--you{
+	background: linear-gradient(180deg,#ff7a59,#ff3b30);
+}
+
+.player .name{
+	font-size: 14px;
+}
+
+.player .chips{
+	background: rgba(0,0,0,0.25);
+	padding: 4px 8px;
+	border-radius: 12px;
+	font-size: 13px;
+}
+
+.player--top-left{
+	top: 8%;
+	left: 18%;
+}
+
+.player--top-right{
+	top: 8%;
+	right: 18%;
+}
+
+.player--bottom{
+	bottom: 6%;
+	left: 50%;
+	transform: translateX(-50%);
+	align-items: center;
+}
+
+.player--bottom .cards{
+	display:flex;
+	gap:8px;
+}
+
+/* smaller screens adjustments */
+@media (max-width: 700px){
+	.card{ width:48px;height:70px }
+	.avatar{ width:44px;height:44px }
+	.player--top-left{ left: 8% }
+	.player--top-right{ right: 8% }
+	.player .name{ font-size:12px }
+}
+
+/* Subtle table felt edge */
+.table:before{
+	content: '';
+	position: absolute;
+	inset: 6% 4%;
+	border-radius: 50% / 40%;
+	background: rgba(11,107,47,0.12);
+}
+
+/* small polish: center highlight */
+.table:after{
+	content: '';
+	position: absolute;
+	left:50%;
+	top:40%;
+	transform: translate(-50%,-50%);
+	width: 60%;
+	height: 30%;
+	border-radius: 40px;
+	background: radial-gradient(ellipse at center, rgba(255,255,255,0.06), transparent 40%);
+}
