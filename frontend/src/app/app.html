@@ -8,20 +8,30 @@
 
 <main class="poker-main">
   <div class="poker-wrapper">
+    <div class="controls">
+      <button class="deal-btn" (click)="dealPreflop()">Deal (Preflop)</button>
+    </div>
     <div class="table">
       <!-- community cards in the center of the table -->
       <div class="community-cards" aria-label="Community cards">
+  <!-- <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
   <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
   <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
   <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
-  <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
-  <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
+  <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div> -->
       </div>
 
       <!-- Top-left CPU player -->
       <div class="player player--top-left" role="group" aria-label="CPU player left">
         <div class="avatar">C1</div>
         <div class="name">CPU Left</div>
+        <div class="cards">
+          <!-- don't show anything initially; when cpu has cards, show backs only -->
+          <ng-container *ngIf="cpuLeftCards.length > 0">
+            <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
+            <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
+          </ng-container>
+        </div>
         <div class="chips">1200</div>
       </div>
 
@@ -29,6 +39,13 @@
       <div class="player player--top-right" role="group" aria-label="CPU player right">
         <div class="avatar">C2</div>
         <div class="name">CPU Right</div>
+        <div class="cards">
+          <!-- show backs only after deal -->
+          <ng-container *ngIf="cpuRightCards.length > 0">
+            <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
+            <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
+          </ng-container>
+        </div>
         <div class="chips">980</div>
       </div>
 
@@ -37,10 +54,11 @@
         <div class="avatar avatar--you">YOU</div>
         <div class="name">Player</div>
         <div class="cards">
-          <div class="card face"><img src="/assets/images/cards/ace_of_spades.png" alt="A of spades"></div>
-          <div class="card face"><img src="/assets/images/cards/king_of_diamonds.png" alt="K of diamonds"></div>
+          <div class="card face" *ngIf="playerCards.length>0"><img [src]="playerCards[0].src" [alt]="playerCards[0].alt"></div>
+          <div class="card face" *ngIf="playerCards.length>1"><img [src]="playerCards[1].src" [alt]="playerCards[1].alt"></div>
         </div>
         <div class="chips">1500</div>
+        <div class="hand-result">{{ handResult }}</div>
       </div>
     </div>
   </div>

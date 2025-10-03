@@ -18,10 +18,10 @@ public class ActivateTemplateRulesService {
     this.templateService = templateService;
   }
 
-  public void fireRules() {
+  public String fireRules(String card1Rank, String card1Suit, String card2Rank, String card2Suit) {
 
-
-      GameState game = createInitialGame();
+      String ret = "";
+      GameState game = createInitialGame(card1Rank, card1Suit, card2Rank, card2Suit);
 
       templateService.generateAndExecuteHandStrengthRules(game);
 
@@ -29,6 +29,7 @@ public class ActivateTemplateRulesService {
       for (Player player : game.getPlayers()) {
         Hand hand = player.getHand();
         if(player.getName().equals("Drools1")){ // ispisi samo za glavnog igraca
+            ret = "Hand strength: " + hand.getHandStrength() + " hand category: " + hand.getHandCategory();
           System.out.printf("Player: %s | Cards: %s | Strength: %.2f | Category: %s%n",
                   player.getName(),
                   formatCards(hand.getHoleCards()),
@@ -38,10 +39,10 @@ public class ActivateTemplateRulesService {
         }
       }
       System.out.println("================================");
-
+      return ret;
   }
 
-  private GameState createInitialGame() {
+  private GameState createInitialGame(String card1Rank, String card1Suit, String card2Rank, String card2Suit) {
     List<String> playerNames = Arrays.asList("Drools1","cpu1","cpu2","cpu3","cpu4");
     String gameId = "test-game-" + System.currentTimeMillis();
 
@@ -49,7 +50,7 @@ public class ActivateTemplateRulesService {
     game.setPhase(GamePhase.PREFLOP);
 
     // dealTestHands(game);
-    dealRandomHands(game);
+    dealSpecificHand(game, card1Rank, card1Suit, card2Rank, card2Suit);
 
     return game;
   }
@@ -76,23 +77,39 @@ public class ActivateTemplateRulesService {
 //    }
 //  }
 
-  private void dealRandomHands(GameState game) {
-    Deck deck = game.getDeck();
-    deck.shuffle();
-    if (deck == null) {
-      throw new IllegalStateException("Deck is not initialized!");
-    }
+  private void dealSpecificHand(GameState game, String card1Rank, String card1Suit, String card2Rank, String card2Suit) {
+      Deck deck = game.getDeck();
+      deck.shuffle();
 
-    for (Player player : game.getPlayers()) {
-      List<Card> cards = deck.dealCards(2);
+      // Deal specific cards to Drools1
+      Suit suit1 = Suit.valueOf(card1Suit.toUpperCase());
+      Suit suit2 = Suit.valueOf(card2Suit.toUpperCase());
 
-      Hand hand = new Hand(cards.get(0), cards.get(1));
-      player.setHand(hand);
-      if(player.getName().equals("Drools1")){
-        System.out.println("Dealt to " + player.getName() + ": " + cards.get(0) + ", " + cards.get(1));
+      Card card1 = new Card(card1Rank.toUpperCase(), suit1);
+      Card card2 = new Card(card2Rank.toUpperCase(), suit2);
+
+      // Remove these specific cards from deck to avoid duplicates
+      deck.removeCard(card1);
+      deck.removeCard(card2);
+
+      // Set hand for Drools1
+      Player mainPlayer = game.getPlayers().stream()
+              .filter(p -> p.getName().equals("Drools1"))
+              .findFirst()
+              .orElseThrow(() -> new RuntimeException("Drools1 player not found"));
+
+      Hand hand = new Hand(card1, card2);
+      mainPlayer.setHand(hand);
+      System.out.println("Dealt to " + mainPlayer.getName() + ": " + card1 + ", " + card2);
+
+      // Deal random hands to other players
+      for (Player player : game.getPlayers()) {
+          if (!player.getName().equals("Drools1")) {
+              List<Card> cards = deck.dealCards(2);
+              Hand randomHand = new Hand(cards.get(0), cards.get(1));
+              player.setHand(randomHand);
+          }
       }
-
-    }
   }
 
   private String formatCards(List<Card> cards) {

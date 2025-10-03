@@ -54,6 +54,36 @@ html,body, :root, :host {
 	position: relative;
 }
 
+.controls{
+	position: absolute;
+	top: 80px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 70;
+}
+
+.deal-btn{
+	background: linear-gradient(180deg,#ffb86b,#ff8a3d);
+	color: #fff;
+	border: none;
+	padding: 10px 16px;
+	border-radius: 8px;
+	font-weight: 700;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+	cursor: pointer;
+}
+
+.deal-btn:active{ transform: translateY(1px) }
+
+.hand-result{
+	margin-top: 8px;
+	background: rgba(0,0,0,0.45);
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 13px;
+	color: #fff;
+}
+
 .table{
 	width: 100%;
 	aspect-ratio: 16/9;

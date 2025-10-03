@@ -41,4 +41,7 @@ public class Deck { // spil
         cards.subList(0, numberOfCards).clear();
         return hand;
     }
+    public void removeCard(Card card){
+        cards.removeIf(c -> c.getRank().equals(card.getRank()) && c.getSuit() == card.getSuit());
+    }
 }
