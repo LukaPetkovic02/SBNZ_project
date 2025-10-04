@@ -10,6 +10,7 @@
   <div class="poker-wrapper">
     <div class="controls">
       <button class="deal-btn" (click)="dealPreflop()">Deal (Preflop)</button>
+      <button class="deal-btn" style="margin-left:8px; background:linear-gradient(180deg,#8be9ff,#39b6ff)" (click)="simulateCep()">Simulate CEP</button>
     </div>
     <div class="table">
       <!-- community cards in the center of the table -->
@@ -23,8 +24,9 @@
 
       <!-- Top-left CPU player -->
       <div class="player player--top-left" role="group" aria-label="CPU player left">
-        <div class="avatar">C1</div>
-        <div class="name">CPU Left</div>
+        <div class="avatar">CPU1</div>
+        <div class="name">Player 1</div>
+        <div class="profile">{{ cpuLeftProfile.profileType }} <span class="confidence">({{ cpuLeftProfile.confidence | number:'1.2-2' }})</span></div>
         <div class="cards">
           <!-- don't show anything initially; when cpu has cards, show backs only -->
           <ng-container *ngIf="cpuLeftCards.length > 0">
@@ -32,13 +34,14 @@
             <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
           </ng-container>
         </div>
-        <div class="chips">1200</div>
+  <div class="chips">{{ cpuLeftChips }}</div>
       </div>
 
       <!-- Top-right CPU player -->
       <div class="player player--top-right" role="group" aria-label="CPU player right">
-        <div class="avatar">C2</div>
-        <div class="name">CPU Right</div>
+        <div class="avatar">CPU2</div>
+        <div class="name">Player 2</div>
+        <div class="profile">{{ cpuRightProfile.profileType }} <span class="confidence">({{ cpuRightProfile.confidence | number:'1.2-2' }})</span></div>
         <div class="cards">
           <!-- show backs only after deal -->
           <ng-container *ngIf="cpuRightCards.length > 0">
@@ -46,7 +49,7 @@
             <div class="card back"><img src="/assets/images/cards/card_back.png" alt="card back"></div>
           </ng-container>
         </div>
-        <div class="chips">980</div>
+  <div class="chips">{{ cpuRightChips }}</div>
       </div>
 
       <!-- Bottom (main) player -->
@@ -57,8 +60,14 @@
           <div class="card face" *ngIf="playerCards.length>0"><img [src]="playerCards[0].src" [alt]="playerCards[0].alt"></div>
           <div class="card face" *ngIf="playerCards.length>1"><img [src]="playerCards[1].src" [alt]="playerCards[1].alt"></div>
         </div>
-        <div class="chips">1500</div>
+  <div class="chips">{{ playerChips }}</div>
         <div class="hand-result">{{ handResult }}</div>
+      </div>
+    </div>
+    <div class="cep-panel">
+      <h3>CEP Logs</h3>
+      <div class="cep-logs">
+        <div *ngFor="let l of cepLogs">{{ l }}</div>
       </div>
     </div>
   </div>

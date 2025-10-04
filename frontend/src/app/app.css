@@ -199,6 +199,17 @@ html,body, :root, :host {
 	gap:8px;
 }
 
+.profile{
+	margin-top:4px;
+	font-size:13px;
+	color:#fff;
+	background: rgba(0,0,0,0.25);
+	padding: 4px 8px;
+	border-radius: 8px;
+}
+
+.confidence{ color: #ffd66b; margin-left:6px }
+
 /* smaller screens adjustments */
 @media (max-width: 700px){
 	.card{ width:48px;height:70px }
@@ -228,4 +239,35 @@ html,body, :root, :host {
 	height: 30%;
 	border-radius: 40px;
 	background: radial-gradient(ellipse at center, rgba(255,255,255,0.06), transparent 40%);
+}
+
+.cep-panel{
+	position: fixed; /* fix to viewport so it doesn't overlap centered table */
+	right: 18px;
+	top: 110px;
+	width: 320px;
+	max-height: 70vh;
+	background: rgba(0,0,0,0.55);
+	border-radius: 8px;
+	padding: 12px;
+	color: #fff;
+	overflow: hidden;
+	z-index: 120;
+	box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+.cep-panel h3{ margin: 0 0 8px 0; font-size: 14px }
+.cep-logs{ overflow: auto; max-height: calc(60vh - 40px); font-size: 12px; display:flex;flex-direction:column-reverse; gap:6px }
+
+@media (max-width: 900px){
+	/* move CEP panel to bottom on narrower screens so it doesn't cover the table */
+	.cep-panel{
+		right: 12px;
+		left: 12px;
+		top: auto;
+		bottom: 12px;
+		width: auto;
+		max-height: 35vh;
+	}
+	.cep-logs{ max-height: calc(35vh - 40px) }
 }

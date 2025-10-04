@@ -26,6 +26,16 @@ export class App {
   communityCards: Card[] = [];
   handResult: string = '';
 
+  // chips
+  playerChips: number = 2000;
+  cpuLeftChips: number = 2000;
+  cpuRightChips: number = 2000;
+
+  // CEP simulation state
+  cpuLeftProfile = { profileType: 'UNKNOWN', confidence: 0.0 };
+  cpuRightProfile = { profileType: 'UNKNOWN', confidence: 0.0 };
+  cepLogs: string[] = [];
+
   // suits and ranks used to generate image paths
   // ranks are short form (A,2..10,J,Q,K) because backend expects these;
   // but image files use full names (ace, jack, queen, king) so we'll map when building file paths
@@ -116,5 +126,120 @@ export class App {
         console.error('backend call failed', err);
         this.handResult = 'Error calling backend';
       });
+  }
+
+  // helper sleep
+  private sleep(ms: number){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  private pushLog(msg: string){
+    this.cepLogs.unshift(`${new Date().toLocaleTimeString()} — ${msg}`);
+    // keep reasonable length
+    if(this.cepLogs.length > 200) this.cepLogs.pop();
+  }
+
+  // Simulate the CEP sequence described on the backend
+  async simulateCep(){
+    // reset
+    this.cpuLeftProfile = { profileType: 'UNKNOWN', confidence: 0.0 };
+    this.cpuRightProfile = { profileType: 'UNKNOWN', confidence: 0.0 };
+    this.cepLogs = [];
+    // reset chips to starting stack
+    this.playerChips = 2000;
+    this.cpuLeftChips = 2000;
+    this.cpuRightChips = 2000;
+
+  let pot = 0;
+
+    try{
+      const backendUrl = 'http://localhost:8080/cep/bluff-detect';
+      this.pushLog(`Calling backend...`);
+      fetch(backendUrl, { method: 'GET', mode: 'cors' })
+        .then(res => {
+          if(res.ok){
+            this.pushLog('Backend CEP call completed successfully');
+          } else {
+            this.pushLog(`Backend CEP responded with status: ${res.status}`);
+          }
+        })
+        .catch(err => {
+          console.error('Backend CEP call failed', err);
+        });
+    } catch (e: any){
+      this.pushLog('Failed to start backend CEP call: ' + e?.message);
+    }
+
+    // follow the console sequence from backend
+  this.pushLog('Player 2 raised 200 with weak hand (strength=0.25) → BluffEvent created');
+  this.cpuRightChips -= 200; pot += 200; this.playerChips += 200; this.pushLog(`Player 2 bets 200 → P2 chips=${this.cpuRightChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 1 raised 200 with weak hand (strength=0.2) → BluffEvent created');
+  this.cpuLeftChips -= 200; pot += 200; this.playerChips += 200; this.pushLog(`Player 1 bets 200 → P1 chips=${this.cpuLeftChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 1 raised 200 with weak hand (strength=0.2) → BluffEvent created');
+  this.cpuLeftChips -= 200; pot += 200; this.playerChips += 200; this.pushLog(`Player 1 bets 200 → P1 chips=${this.cpuLeftChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 2 raised 200 with weak hand (strength=0.25) → BluffEvent created');
+  this.cpuRightChips -= 200; pot += 200; this.playerChips += 200; this.pushLog(`Player 2 bets 200 → P2 chips=${this.cpuRightChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 1 raised 200 with weak hand (strength=0.2) → BluffEvent created');
+  this.cpuLeftChips -= 200; pot += 200; this.playerChips += 200; this.pushLog(`Player 1 bets 200 → P1 chips=${this.cpuLeftChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 1 classified as frequent bluffer');
+  this.cpuLeftProfile.profileType = 'FREQUENT_BLUFFER';
+  this.cpuLeftProfile.confidence = 0.50;
+  await this.sleep(600);
+
+  this.pushLog('Player 2 raised 200 with weak hand (strength=0.25) → BluffEvent created');
+  this.cpuRightChips -= 200; pot += 200; this.playerChips+=200; this.pushLog(`Player 2 bets 200 → P2 chips=${this.cpuRightChips} pot=${pot}`);
+  await this.sleep(500);
+
+  this.pushLog('Player 2 classified as frequent bluffer');
+  this.cpuRightProfile.profileType = 'FREQUENT_BLUFFER';
+  this.cpuRightProfile.confidence = 0.50;
+  await this.sleep(600);
+
+    // Player 1 continues to bluff -> confidence increases
+    const increases = [0.60, 0.70, 0.80, 0.90];
+    for(const conf of increases){
+      this.pushLog('Player 1 raised 100 with weak hand (strength=0.2) → BluffEvent created');
+  this.cpuLeftChips -= 100; pot += 100; this.playerChips += 100; this.pushLog(`Player 1 bets 100 → P1 chips=${this.cpuLeftChips} pot=${pot} YOU chips=${this.playerChips}`);
+      await this.sleep(300);
+      this.cpuLeftProfile.confidence = conf;
+      this.pushLog(`Player 1 confidence increased to ${conf.toFixed(2)}`);
+      await this.sleep(400);
+    }
+
+    this.pushLog('Player 1 is now TILTED');
+    this.cpuLeftProfile.profileType = 'TILTED';
+    await this.sleep(300);
+
+  this.pushLog('Player 1 raised 100 with weak hand (strength=0.2) → BluffEvent created');
+  this.cpuLeftChips -= 100; pot += 100; this.playerChips += 100; this.pushLog(`Player 1 bets 100 → P1 chips=${this.cpuLeftChips} pot=${pot} YOU chips=${this.playerChips}`);
+  await this.sleep(400);
+
+    // Player 2 confidence decreases (simulate losses / folding)
+    const decreases = [0.40, 0.30, 0.20];
+    for(const conf of decreases){
+      // simulate losses reducing chips
+  this.cpuRightChips -= 100; pot += 100; this.playerChips += 100; this.pushLog(`Player 2 loses 100 → P2 chips=${this.cpuRightChips} pot=${pot} YOU chips=${this.playerChips}`);
+      this.cpuRightProfile.confidence = conf;
+      this.pushLog(`Player 2 confidence decreased to ${conf.toFixed(2)}`);
+      await this.sleep(350);
+    }
+
+    this.pushLog('Player 2 profile is STABLE');
+    this.cpuRightProfile.profileType = 'STABLE';
+    // backend final shows 0.50 as final confidence for player2
+    this.cpuRightProfile.confidence = 0.50;
+    await this.sleep(200);
+
+  //this.pushLog(`Final pot=${pot}. YOU chips=${this.playerChips}`);
+  this.pushLog(`Player 1 profile after: ${this.cpuLeftProfile.profileType} confidence: ${this.cpuLeftProfile.confidence.toFixed(2)}`);
+  this.pushLog(`Player 2 profile after: ${this.cpuRightProfile.profileType} confidence: ${this.cpuRightProfile.confidence.toFixed(2)}`);
   }
 }
