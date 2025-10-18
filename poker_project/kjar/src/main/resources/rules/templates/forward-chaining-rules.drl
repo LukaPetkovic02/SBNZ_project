@@ -1,0 +1,64 @@
+package rules.templates;
+
+import com.ftn.sbnz.backward.model.models.*;
+import com.ftn.sbnz.backward.model.enums.*;
+import com.ftn.sbnz.backward.model.enums.ActionType;
+import com.ftn.sbnz.backward.model.models.DecisionContext;
+import com.ftn.sbnz.backward.model.models.ActionRecommendation;
+
+rule "Premium Hand - Strong Bet"
+    salience 100
+when
+    $context : DecisionContext(handStrength >= 0.8, handCategory == "PREMIUM")
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.BET);
+    $rec.setBetAmount((int)($context.getPotSize() * 0.75));
+    $rec.setConfidence(0.9);
+    $rec.setReasoning("Premium hand - aggressive betting");
+    update($rec);
+    System.out.println("RULE FIRED: Premium hand aggressive betting");
+end
+
+rule "Strong Hand - Value Bet"
+    salience 90
+when
+    $context : DecisionContext(handStrength >= 0.65 && handStrength < 0.8, handCategory == "STRONG")
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.BET);
+    $rec.setBetAmount((int)($context.getPotSize() * 0.5));
+    $rec.setConfidence(0.8);
+    $rec.setReasoning("Strong hand - value betting");
+    update($rec);
+    System.out.println("RULE FIRED: Strong hand value betting");
+end
+
+rule "Playable Hand - Call Good Odds"
+    salience 80
+when
+    $context : DecisionContext(handStrength >= 0.4 && handStrength < 0.65, handCategory == "PLAYABLE", potOdds < 0.3)
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.CALL);
+    $rec.setBetAmount($context.getBetToCall());
+    $rec.setConfidence(0.7);
+    $rec.setReasoning("Playable hand with good pot odds");
+    update($rec);
+    System.out.println("RULE FIRED: Playable hand call with good odds");
+end
+
+
+rule "Default Fold"
+    salience 1
+when
+    $context : DecisionContext()
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.FOLD);
+    $rec.setBetAmount(0);
+    $rec.setConfidence(0.5);
+    $rec.setReasoning("Default conservative play");
+    update($rec);
+    System.out.println("RULE FIRED: Default fold");
+end

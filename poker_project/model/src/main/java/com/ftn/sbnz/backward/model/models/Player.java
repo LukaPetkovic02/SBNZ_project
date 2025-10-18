@@ -119,6 +119,9 @@ public class Player {
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
 
+    public double getAvgBetSize() {return avgBetSize; }
+    public void setAvgBetSize(double avgBet) {this.avgBetSize = avgBet; }
+
     public boolean isAllIn() { return allIn; }
     public void setAllIn(boolean allIn) { this.allIn = allIn; }
 

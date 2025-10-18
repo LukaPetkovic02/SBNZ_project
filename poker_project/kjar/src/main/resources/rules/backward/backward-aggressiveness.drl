@@ -1,0 +1,33 @@
+package rules.backward;
+
+import com.ftn.sbnz.backward.model.models.PlayerStats;
+import java.util.List;
+import java.util.Map;
+
+global java.util.List statsList
+global java.util.Map playerCounters
+global java.util.Map playerRounds
+
+rule "Backward Aggression Check"
+when
+    $pid : String() from entry-point "DEFAULT"
+    $counter : Integer() from playerCounters.get($pid)
+    $round : Integer() from playerRounds.get($pid)
+    eval( $counter != null && $round != null && $counter < 6 && $round > 0 )
+then
+    int roundIndex = $round - 1;
+    PlayerStats stats = (PlayerStats) statsList.get(roundIndex);
+    int score = 0;
+
+    if (stats.getPreflopRaises() >= 4) score++;
+    if (stats.getContinuationBets() >= 3) score++;
+    if (stats.getAvgBetSize() > stats.getAvgBetAllPlayers() * 1.5) score++;
+
+    playerCounters.put($pid, $counter + score);
+    playerRounds.put($pid, $round - 1);
+
+    System.out.println("Igrač " + $pid + " runda " + stats.getRound() +
+                       ": +" + score + " (ukupno " + playerCounters.get($pid) + ")");
+
+    update($pid);
+end
