@@ -1,0 +1,48 @@
+package rules.cep;
+
+import com.ftn.sbnz.backward.model.events.BadBeatEvent;
+import com.ftn.sbnz.backward.model.events.AggressiveActionEvent;
+import com.ftn.sbnz.backward.model.events.BetEvent;
+import com.ftn.sbnz.backward.model.models.Player;
+import com.ftn.sbnz.backward.model.models.TiltIndicator;
+import org.kie.api.runtime.rule.EntryPoint;
+import org.kie.api.runtime.rule.FactHandle;
+
+rule "Detect Player on Tilt"
+when
+    // Igrac koji nije već označen kao tiltovan
+    $player : Player($id : id, profile.profileType != "HIGH_TILT")
+    // Prati događaj velikog gubitka (bad beat)
+    $badBeat : BadBeatEvent(playerId == $id, $lossTime : timestamp) from entry-point "game-events"
+    // Broji agresivne poteze u narednih 5 minuta
+    Number(intValue >= 3) from accumulate(
+        AggressiveActionEvent(playerId == $id) over window:time(5m) from entry-point "player-actions",
+        count()
+    )
+
+    // Računa prosečan bet i poredi sa 2x prosekom igrača
+    Number(doubleValue > ($player.avgBetSize * 2)) from accumulate(
+        BetEvent(playerId == $id, $amount : amount) over window:time(5m) from entry-point "player-actions",
+        average($amount)
+    )
+then
+    // Ukloni stare tilt indikatore da se ne dupliraju
+    EntryPoint ep = drools.getEntryPoint("game-events");
+    for (FactHandle fh : ep.getFactHandles()) {
+        Object obj = ep.getObject(fh);
+        if (obj instanceof TiltIndicator) {
+            TiltIndicator ti = (TiltIndicator) obj;
+            if (ti.getPlayerId().equals($id)) {
+                ep.retract(fh);
+            }
+        }
+    }
+
+    TiltIndicator tilt = new TiltIndicator($id, "HIGH_TILT", System.currentTimeMillis());
+    $player.getProfile().setProfileType("HIGH_TILT");
+    $player.getProfile().setConfidence(0.9);
+    insert(tilt);
+    update($player);
+
+    System.out.println("⚠ Player " + $id + " is on TILT - exploit opportunity!");
+end

@@ -116,4 +116,5 @@ public class ActivateTemplateRulesService {
     if (cards.size() != 2) return "No cards";
     return cards.get(0).toString() + ", " + cards.get(1).toString();
   }
+
 }

@@ -11,16 +11,21 @@ public class PlayerAction {
     private String errorMessage;
     private boolean isAllIn = false;
     private long timestamp;
+    private double confidence;
+    private String reasoning;
 
     public PlayerAction() {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public PlayerAction(String playerId, ActionType actionType, int amount) {
+    public PlayerAction(String playerId, ActionType actionType, int amount,
+                        double confidence, String reasoning) {
         this();
         this.playerId = playerId;
         this.actionType = actionType;
         this.amount = amount;
+        this.confidence = confidence;
+        this.reasoning = reasoning;
     }
 
     // Getteri i setteri
@@ -47,4 +52,22 @@ public class PlayerAction {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public double getConfidence() {
+        return confidence;
+    }
+    public void setConfidence(double confidence) {
+        this.confidence = confidence;
+    }
+    public String getReasoning() {
+        return reasoning;
+    }
+    public void setReasoning(String reasoning) {
+        this.reasoning = reasoning;
+    }
+    public String getConfidenceLevel() {
+        if (confidence >= 0.8) return "High";
+        if (confidence >= 0.6) return "Medium";
+        if (confidence >= 0.4) return "Low";
+        return "Very Low";
+    }
 }

@@ -2,4 +2,10 @@
     <kbase name="cepKbase" eventProcessingMode="stream" packages="rules.cep, rules.forward_chaining">
         <ksession name="cepKsession" type="stateful" clockType="realtime"/>
     </kbase>
+    <kbase name="forwardKBase" eventProcessingMode="stream" packages="rules.templates">
+        <ksession name="forwardKSession" type="stateful" clockType="realtime"/>
+    </kbase>
+    <kbase name="backwardKBase" eventProcessingMode="stream" packages="rules.backward">
+        <ksession name="backwardKSession" type="stateful" clockType="realtime"/>
+    </kbase>
 </kmodule>
