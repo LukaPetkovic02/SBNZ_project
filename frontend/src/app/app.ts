@@ -121,6 +121,15 @@ export class App {
       .then(txt => {
         // backend returns a string like: "Hand strength: 0.9 hand category: PREMIUM"
         this.handResult = txt;
+        return fetch("http://localhost:8080/forward/suggest-simple", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(this.handResult),
+        });
+      })
+      .then(res => res.text())
+      .then(result => {
+        this.pushLog(result);
       })
       .catch(err => {
         console.error('backend call failed', err);
@@ -134,7 +143,7 @@ export class App {
   private pushLog(msg: string){
     this.cepLogs.unshift(`${new Date().toLocaleTimeString()} — ${msg}`);
     // keep reasonable length
-    if(this.cepLogs.length > 200) this.cepLogs.pop();
+    if(this.cepLogs.length > 250) this.cepLogs.pop();
   }
 
   // Simulate the CEP sequence described on the backend
@@ -241,5 +250,143 @@ export class App {
   //this.pushLog(`Final pot=${pot}. YOU chips=${this.playerChips}`);
   this.pushLog(`Player 1 profile after: ${this.cpuLeftProfile.profileType} confidence: ${this.cpuLeftProfile.confidence.toFixed(2)}`);
   this.pushLog(`Player 2 profile after: ${this.cpuRightProfile.profileType} confidence: ${this.cpuRightProfile.confidence.toFixed(2)}`);
+  }
+
+  async simulateRound() {
+    this.cepLogs = [];
+    try {
+      const res = await fetch('http://localhost:8080/backward/simulate-round');
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const log: string = await res.text();
+      // push u log
+      this.pushLog(log)
+      await this.sleep(500);
+
+    } catch (e: any) {
+      console.error(e);
+      this.pushLog(e.message)
+      await this.sleep(500);
+    }
+  }
+
+  async backward(){
+    this.cepLogs = [];
+    try {
+      const res = await fetch('http://localhost:8080/backward/test');
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const log: string = await res.text();
+      // push u log
+      this.pushLog(log)
+      await this.sleep(500);
+    } catch (e: any) {
+      console.error(e);
+      this.pushLog(e.message)
+      await this.sleep(500);
+    }
+  }
+
+  async cepTilt(){
+    this.cepLogs = [];
+    try {
+      const res = await fetch('http://localhost:8080/cep/tilt-detect');
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const log: string = await res.text();
+      // push u log
+      this.pushLog("Starting round simulation...");
+      let pot = 0;
+      let player1Chips = 2000;
+      let player2Chips = 2000;
+      let player3Chips = 2000;
+      // === Pre-BadBeat runda ===
+      this.pushLog("Player 2 bets 100");
+      player2Chips -= 100; pot += 100;
+      this.pushLog(`P2 chips=${player2Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      this.pushLog("Player 3 calls 100");
+      player3Chips -= 100; pot += 100;
+      this.pushLog(`P3 chips=${player3Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      this.pushLog("Player 1 raises to 300");
+      player1Chips -= 300; pot += 300;
+      this.pushLog(`P1 chips=${player1Chips} pot=${pot}`);
+      this.pushLog("Aggressive action detected for Player 1");
+      await this.sleep(700);
+
+      this.pushLog("Player 2 folds");
+      await this.sleep(400);
+
+      this.pushLog("Player 3 calls 300");
+      player3Chips -= 300; pot += 300;
+      this.pushLog(`P3 chips=${player3Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      this.pushLog("Player 1 bets 200");
+      player1Chips -= 200; pot += 200;
+      this.pushLog(`P1 chips=${player1Chips} pot=${pot}`);
+      this.pushLog("Aggressive action detected for Player 1");
+      await this.sleep(700);
+
+      // === BAD BEAT DOGAĐAJ ===
+      this.pushLog("Player 1 loses a massive pot with a strong hand!");
+      player1Chips -= 800;
+      this.pushLog("BadBeatEvent detected for Player 1");
+      this.pushLog(`P1 chips=${player1Chips} pot reset to 0`);
+      pot = 0;
+      await this.sleep(1000);
+
+      // === Post-BadBeat - normalni potezi i 3 agresivna poteza ===
+      this.pushLog("Player 2 bets 150");
+      player2Chips -= 150; pot += 150;
+      this.pushLog(`P2 chips=${player2Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      this.pushLog("Player 3 raises to 300");
+      player3Chips -= 300; pot += 300;
+      this.pushLog(`P3 chips=${player3Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      // 1️⃣ agresivan potez
+      this.pushLog("Player 1 raises to 600");
+      player1Chips -= 600; pot += 600;
+      this.pushLog(`P1 chips=${player1Chips} pot=${pot}`);
+      this.pushLog("Aggressive action detected for Player 1");
+      await this.sleep(700);
+
+      this.pushLog("Player 3 folds");
+      await this.sleep(400);
+
+      this.pushLog("Player 2 calls 600");
+      player2Chips -= 600; pot += 600;
+      this.pushLog(`P2 chips=${player2Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      // 2️⃣ agresivan potez
+      this.pushLog("Player 1 bets 400");
+      player1Chips -= 400; pot += 400;
+      this.pushLog(`P1 chips=${player1Chips} pot=${pot}`);
+      this.pushLog("Aggressive action detected for Player 1");
+      await this.sleep(700);
+
+      this.pushLog("Player 2 calls 400");
+      player2Chips -= 400; pot += 400;
+      this.pushLog(`P2 chips=${player2Chips} pot=${pot}`);
+      await this.sleep(500);
+
+      // 3️⃣ agresivan potez
+      this.pushLog("Player 1 goes all-in for 500");
+      player1Chips -= 500; pot += 500;
+      this.pushLog(`P1 chips=${player1Chips} pot=${pot}`);
+      this.pushLog("Aggressive action detected for Player 1");
+      await this.sleep(700);
+
+      this.pushLog(log)
+      await this.sleep(500);
+    } catch (e: any) {
+      console.error(e);
+      this.pushLog(e.message)
+      await this.sleep(500);
+    }
   }
 }
