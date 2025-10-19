@@ -208,4 +208,76 @@ public class ForwardChainingDecisionService {
         System.out.println(">>> Poverenje: " + result.getConfidence());
         System.out.println(">>> Obrazloženje: " + result.getReasoning());
     }
+
+    public String suggestFromString(String handCategory) {
+        handCategory = handCategory.substring(1, handCategory.length() - 1);
+        KieSession session = kieContainer.newKieSession("forwardKSession");
+
+        GameState gameState = new GameState("simpleGame", Arrays.asList("Uros"), 2000);
+        gameState.setPhase(GamePhase.FLOP);
+        gameState.setPot(1200);
+        gameState.setCurrentBet(200);
+        gameState.setBigBlindAmount(50);
+
+        Player player = new Player("player1", "Uros", 2000, 1);
+        Hand hand = new Hand();
+        hand.setHandCategory(handCategory);
+        double strength = 0.0;
+        switch (handCategory) {
+            case "PREMIUM":
+                strength = 0.85;
+                break;
+            case "STRONG":
+                strength = 0.7;
+                break;
+            case "PLAYABLE":
+                strength = 0.55;
+                break;
+            case "MARGINAL":
+                strength = 0.4;
+                break;
+            case "WEAK":
+                strength = 0.25;
+                break;
+            default:
+                strength = 0.3;
+                break;
+        }
+        hand.setHandStrength(strength);
+        player.setHand(hand);
+        player.setStatus(PlayerStatus.ACTIVE);
+        gameState.getPlayers().add(player);
+
+        // dinamički betToCall i potOdds
+        int betToCall = 100 + (int)(Math.random() * 100); // 100 - 250
+        double potOdds = (double) betToCall / (gameState.getPot() + betToCall);
+
+        DecisionContext context = new DecisionContext();
+        context.setPlayerId("player1");
+        context.setHandCategory(handCategory);
+        context.setHandStrength(hand.getHandStrength());
+        context.setPotSize(gameState.getPot());
+        context.setCurrentBet(gameState.getCurrentBet());
+        context.setBetToCall(betToCall);
+        context.setPotOdds(potOdds);
+
+        ActionRecommendation rec = new ActionRecommendation("player1", null, 0, 0.0, null);
+
+        session.insert(gameState);
+        session.insert(player);
+        session.insert(player.getHand());
+        session.insert(context);
+        session.insert(rec);
+
+        session.fireAllRules();
+        session.dispose();
+
+        return "Recommended action: " + rec.getRecommendedAction()
+                + ", amount: " + rec.getBetAmount()
+                + ", reason: " + rec.getReasoning()
+                + ", potOdds: " + String.format("%.2f", potOdds)
+                + ", strength: " + hand.getHandStrength();
+    }
+
+
 }

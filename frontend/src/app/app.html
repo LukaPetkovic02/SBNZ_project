@@ -5,12 +5,16 @@
     <h1>Texas Hold'em Poker</h1>
   </div>
 </header>
-
+<div class="controls">
+  <button class="deal-btn" (click)="backward()">Backward</button>
+  <button class="deal-btn" style="margin-left:8px;"  (click)="cepTilt()">Simulate CEP</button>
+</div>
 <main class="poker-main">
   <div class="poker-wrapper">
     <div class="controls">
       <button class="deal-btn" (click)="dealPreflop()">Deal (Preflop)</button>
       <button class="deal-btn" style="margin-left:8px; background:linear-gradient(180deg,#8be9ff,#39b6ff)" (click)="simulateCep()">Simulate CEP</button>
+      <button class="deal-btn" style="margin-left:8px" (click)="simulateRound()">Sim Round</button>
     </div>
     <div class="table">
       <!-- community cards in the center of the table -->
@@ -65,7 +69,7 @@
       </div>
     </div>
     <div class="cep-panel">
-      <h3>CEP Logs</h3>
+      <h3>Logs</h3>
       <div class="cep-logs">
         <div *ngFor="let l of cepLogs">{{ l }}</div>
       </div>

@@ -23,4 +23,14 @@ public class PlayerStats {
     public double getAvgBetSize() { return avgBetSize; }
     public double getAvgBetAllPlayers() { return avgBetAllPlayers; }
     public int getRound() {return round;}
+
+    @Override
+    public String toString() {
+        return "Round " + round + " → PlayerStats: " +
+                "playerId='" + playerId + '\'' +
+                ", preflopRaises=" + preflopRaises +
+                ", continuationBets=" + continuationBets +
+                ", avgBetSize=" + String.format("%.2f", avgBetSize) +
+                ", avgBetAllPlayers=" + String.format("%.2f", avgBetAllPlayers);
+    }
 }

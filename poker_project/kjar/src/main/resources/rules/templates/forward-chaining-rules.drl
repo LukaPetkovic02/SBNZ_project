@@ -37,7 +37,7 @@ end
 rule "Playable Hand - Call Good Odds"
     salience 80
 when
-    $context : DecisionContext(handStrength >= 0.4 && handStrength < 0.65, handCategory == "PLAYABLE", potOdds < 0.3)
+    $context : DecisionContext(handStrength >= 0.5 && handStrength < 0.65, handCategory == "PLAYABLE", potOdds < 0.3)
     $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
 then
     $rec.setRecommendedAction(ActionType.CALL);
@@ -48,6 +48,33 @@ then
     System.out.println("RULE FIRED: Playable hand call with good odds");
 end
 
+rule "Marginal Hand - Cautious Fold"
+    salience 60
+when
+    $context : DecisionContext(handStrength >= 0.35 && handStrength < 0.5, handCategory == "MARGINAL")
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.FOLD);
+    $rec.setBetAmount(0);
+    $rec.setConfidence(0.6);
+    $rec.setReasoning("Marginal hand - folding is recommended");
+    update($rec);
+    System.out.println("RULE FIRED: Marginal hand fold");
+end
+
+rule "Weak Hand - Auto Fold"
+    salience 50
+when
+    $context : DecisionContext(handStrength < 0.35, handCategory == "WEAK")
+    $rec : ActionRecommendation(playerId.equals($context.playerId), recommendedAction == null)
+then
+    $rec.setRecommendedAction(ActionType.FOLD);
+    $rec.setBetAmount(0);
+    $rec.setConfidence(0.55);
+    $rec.setReasoning("Weak hand - automatic fold");
+    update($rec);
+    System.out.println("RULE FIRED: Weak hand auto fold");
+end
 
 rule "Default Fold"
     salience 1

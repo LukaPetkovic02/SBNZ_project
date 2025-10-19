@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/forward")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ForwardChainingController {
 
     private final ForwardChainingDecisionService forwardService;
@@ -20,4 +21,10 @@ public class ForwardChainingController {
         forwardService.testForwardDecision();
         return "Forward chaining test executed — check console output for results.";
     }
+
+    @PostMapping("/suggest-simple")
+    public String suggestActionSimple(@RequestBody String handCategory) {
+        return forwardService.suggestFromString(handCategory);
+    }
+
 }

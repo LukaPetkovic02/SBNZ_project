@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/backward")
+@CrossOrigin(origins = "http://localhost:4200")
 public class BackwardChainingController {
 
     private final BackwardAggressionService backwardService;
@@ -18,7 +19,12 @@ public class BackwardChainingController {
 
     @GetMapping("/test")
     public String testBackwardAggression() {
-        backwardService.testBackwardAggression();
-        return "Backward reasoning test executed — check console output for results.";
+        return backwardService.testBackwardAggression();
+    }
+
+    @GetMapping("/simulate-round")
+    public String simulateRound() {
+        // poziv servisa koji simulira jednu rundu i vraća string
+        return backwardService.simulateRound();
     }
 }
