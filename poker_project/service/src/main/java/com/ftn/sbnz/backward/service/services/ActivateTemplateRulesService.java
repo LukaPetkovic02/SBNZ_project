@@ -29,7 +29,8 @@ public class ActivateTemplateRulesService {
       for (Player player : game.getPlayers()) {
         Hand hand = player.getHand();
         if(player.getName().equals("Drools1")){ // ispisi samo za glavnog igraca
-            ret = "Hand strength: " + hand.getHandStrength() + " hand category: " + hand.getHandCategory();
+//            ret = "Hand strength: " + hand.getHandStrength() + " hand category: " + hand.getHandCategory();
+            ret = hand.getHandCategory();
           System.out.printf("Player: %s | Cards: %s | Strength: %.2f | Category: %s%n",
                   player.getName(),
                   formatCards(hand.getHoleCards()),
